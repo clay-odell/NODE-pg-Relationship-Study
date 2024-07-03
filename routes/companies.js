@@ -1,4 +1,5 @@
 const express = require('express');
+const ExpressError = require('../expressError')
 const router = express.Router();
 const db = require('../db');
 
@@ -47,6 +48,7 @@ router.post('/', async function (req, res, next) {
 });
 
 router.put('/:code', async function (req, res, next) {
+    //updates an existing company in the database and returns JSON or else 404
     try {
         const {name, description } = req.body;
         const result = await db.query(
@@ -56,12 +58,29 @@ router.put('/:code', async function (req, res, next) {
             [name, description, req.params.code]
         );
         if (result.rows.length === 0) {
-            throw new ExpressError(`Cannot find company with code ${code}`, 404);
+            throw new ExpressError(`Cannot find company with code ${req.params.code}`, 404);
         }
         return res.status(201).json(result.rows[0])
     } catch (err) {
         return next(err);
     }
-})
+});
+
+router.delete('/:code', async function (req, res, next) {
+    //deletes company from database if it exists otherwise, 404
+    try {
+        const result = await db.query(
+            `DELETE FROM companies
+            WHERE code = $1`,
+            [req.params.code]
+        );
+        if (result.rowCount === 0) {
+            throw new ExpressError(`Cannot delete company with code '${req.params.code}' because no such code exists`, 404);
+        }
+        return res.status(200).json({message: "deleted"})
+    }catch (err){
+        return next(err);
+    }
+});
 
 module.exports = router;
