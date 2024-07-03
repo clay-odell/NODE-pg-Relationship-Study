@@ -29,4 +29,21 @@ router.get('/:code', async function (req, res, next) {
     }
 });
 
+router.post('/', async function (req, res, next) {
+    //Posts code, name, and description and returns 201 and JSON for the post
+    try{
+        const {code, name, description} = req.body;
+        const result = await db.query(
+            `INSERT INTO companies (code, name, description)
+            VALUES ($1, $2, $3)
+            RETURNING code, name, description`,
+            [code, name, description]
+        );
+        return res.status(201).json(result.rows[0]);
+
+    } catch (err) {
+        return next (err);
+    }
+});
+
 module.exports = router;
