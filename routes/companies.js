@@ -60,7 +60,7 @@ router.put('/:code', async function (req, res, next) {
         if (result.rows.length === 0) {
             throw new ExpressError(`Cannot find company with code ${req.params.code}`, 404);
         }
-        return res.status(201).json(result.rows[0])
+        return res.status(200).json(result.rows[0])
     } catch (err) {
         return next(err);
     }

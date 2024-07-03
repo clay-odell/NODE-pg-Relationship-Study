@@ -48,7 +48,27 @@ router.post('/', async function (req, res, next) {
     } catch (err) {
         return next (err);
     }
-})
+});
+
+router.put('/:id', async function (req, res, next) {
+    //updates the amt of an invoice by id or returns 404
+    try {
+        const { id } = req.params;
+        const { amt } = req.body;
+        const invoiceResult = await db.query(
+            `UPDATE invoices SET amt=$1
+            WHERE id = $2
+            RETURNING id, comp_code, amt, paid, add_date, paid_date`,
+            [amt, id]
+        )
+        if (invoiceResult.rows.length === 0) {
+            throw new ExpressError(`'${id}' not found`, 404);
+        }
+        return res.status(200).json({invoice: invoiceResult.rows[0]});
+    } catch (err) {
+        return next (err)
+    }
+});
 
 
 
