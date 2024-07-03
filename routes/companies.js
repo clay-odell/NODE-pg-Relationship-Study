@@ -7,7 +7,7 @@ router.get('/', async function (req, res, next){
     //returns a list of the companies from the DB
     try {
         const result = await db.query(
-            `SELECT code, name FROM companies`
+            `SELECT code, name, description FROM companies`
         );
         return res.json({companies: result.rows});
     } catch (err){
