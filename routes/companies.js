@@ -51,7 +51,11 @@ router.post("/", async function (req, res, next) {
     );
     return res.status(201).json(result.rows[0]);
   } catch (err) {
+    if (err.code === '23505') {
+        throw new ExpressError(`Company with '${code}' already exists`, 400);
+    } else {
     return next(err);
+    }
   }
 });
 
